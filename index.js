@@ -34,7 +34,7 @@ module.exports = function ( rawUrl ) {
       request.auth( auth.user, auth.pass )
         .get( webmakerUrl + "/user/" + id, function ( error, response, body ) {
           if ( error || body.error ) {
-            return callback( error || body.error );;
+            return callback( error || body.error );
           }
 
           callback( null, body.user );
@@ -44,7 +44,7 @@ module.exports = function ( rawUrl ) {
       request.auth( auth.user, auth.pass, false )
         .get( webmakerUrl + "/isAdmin?id=" + id, function ( error, response, body ) {
           if ( error || body.error ) {
-            return callback( error || body.error );;
+            return callback( error || body.error );
           }
 
           callback( null, body.isAdmin );
