@@ -1,0 +1,32 @@
+{
+  "name": "webmaker-sso",
+  "version": "0.0.1",
+  "description": "Mozilla Webmaker SSO helper & integration module",
+  "keywords": [
+    "mozilla",
+    "persona",
+    "webmaker",
+    "SSO",
+    "express"
+  ],
+  "author": {
+    "name": "Kieran Sedgwick",
+    "email": "kieran.sedgwick@gmail.com"
+  },
+  "license": "Apache",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ksedge/express-sso.git"
+  },
+  "dependencies": {
+    "request": "2.21.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.4.3"
+  },
+  "scripts": {
+    "test": "grunt"
+  }
+}
