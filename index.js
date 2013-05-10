@@ -15,16 +15,18 @@
 */
 
 // Global requires
-var request = require( 'request' ),
-    url = require( 'url' );
+var request = require( "request" ),
+    url = require( "url" );
 
 // Module.exports
 module.exports = function ( rawUrl ) {
   var parsedUrl = url.parse( rawUrl ),
       webmakerUrl = parsedUrl.href + parsedUrl.host,
+      auth = parsedUrl.auth.split(":");
+      
       auth = {
-        user: (parsedUrl.auth.split(":"))[0],
-        pass: (parsedUrl.auth.split(":"))[1]
+        user: auth[0],
+        pass: auth[1]
       };
 
   return {
@@ -32,8 +34,7 @@ module.exports = function ( rawUrl ) {
       request.auth( auth.user, auth.pass )
         .get( webmakerUrl + "/user/" + id, function ( error, response, body ) {
           if ( error || body.error ) {
-            callback( error || body.error );
-            return;
+            return callback( error || body.error );;
           }
 
           callback( null, body.user );
@@ -43,13 +44,11 @@ module.exports = function ( rawUrl ) {
       request.auth( auth.user, auth.pass, false )
         .get( webmakerUrl + "/isAdmin?id=" + id, function ( error, response, body ) {
           if ( error || body.error ) {
-            callback( error || body.error );
-            return;
+            return callback( error || body.error );;
           }
 
           callback( null, body.isAdmin );
         });
     }
   };
-
 };
