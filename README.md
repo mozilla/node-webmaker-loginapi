@@ -1,4 +1,4 @@
-Webmaker-SSO
+Webmaker-LoginAPI
 ============
 
 ## Setup
@@ -13,7 +13,7 @@ Pass the module an http address including a user/pass according to the `http` ur
 
 i.e. 
 
-`require( "webmaker-sso" )( "http://admin:roflcoptor@login.wm.org" )`
+`require( "webmaker-loginapi" )( "http://admin:roflcoptor@login.wm.org" )`
 
 ## Usage
 
