@@ -1,5 +1,5 @@
 {
-  "name": "webmaker-sso",
+  "name": "webmaker-loginapi",
   "version": "0.0.1",
   "description": "Mozilla Webmaker SSO helper & integration module",
   "keywords": [
@@ -16,7 +16,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mozilla/webmaker-sso.git"
+    "url": "https://github.com/mozilla/node-webmaker-loginapi.git"
   },
   "dependencies": {
     "request": "2.21.0"
