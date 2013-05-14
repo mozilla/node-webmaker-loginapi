@@ -21,28 +21,57 @@ var request = require( "request" ),
 // Module.exports
 module.exports = function ( rawUrl ) {
   var parsedUrl = url.parse( rawUrl ),
-      webmakerUrl = parsedUrl.href + parsedUrl.host,
-      auth = parsedUrl.auth.split(":");
-      
-      auth = {
-        user: auth[0],
-        pass: auth[1]
-      };
+      // Force a trailing slash
+      webmakerUrl = parsedUrl.href.replace( /\/$/, '/' ),
+      authBits = parsedUrl.auth.split(":");
+
+  if ( parsedUrl.protocol !== ("http:" || "https:") ) {
+    return console.error("Webmaker-LoginAPI ERROR: Invalid uri!");
+  }
+
+  authBits = {
+    user: authBits[0],
+    pass: authBits[1]
+  };
 
   return {
     getUser: function ( id, callback ) {
-      request.auth( auth.user, auth.pass )
-        .get( webmakerUrl + "/user/" + id, function ( error, response, body ) {
-          if ( error || body.error ) {
-            return callback( error || body.error );
-          }
+      request({
+        auth: {
+          username: authBits.user,
+          password: authBits.pass,
+          sendImmediately: false
+        },
+        method: "GET",
+        uri: webmakerUrl + "user/" + id,
+        json: true
+      }, function ( error, response, body ) {
+        if ( response.statusCode == 401 ) {
+          return callback( "Authentication failed!" );
+        }
 
-          callback( null, body.user );
-        });
+        if ( error || body.error ) {
+          return callback( error || body.error );
+        }
+
+        callback( null, body.user );
+      });
     },
     isAdmin: function ( id, callback ) {
-      request.auth( auth.user, auth.pass, false )
-        .get( webmakerUrl + "/isAdmin?id=" + id, function ( error, response, body ) {
+      request({
+        auth: {
+          username: authBits.user,
+          password: authBits.pass,
+          sendImmediately: false
+        },
+        method: "GET",
+        uri: webmakerUrl + "isAdmin?id=" + id,
+        json: true
+      }, function ( error, response, body ) {
+          if ( response.statusCode == 401 ) {
+            return callback( "Authentication failed!" );
+          }
+
           if ( error || body.error ) {
             return callback( error || body.error );
           }
