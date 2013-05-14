@@ -28,3 +28,10 @@ The module returns an object with two methods:
  ...which retrieves the user permissions for the passed `id`, passing the callback the parameters `( errorString, [isAdmin] )` 
 
 See: https://github.com/mozilla/login.webmaker.org/wiki/LoginAPI-&-User-Model
+
+## Testing
+
+Ensure the `grunt` and `mocha` npm modules are installed globally, then run
+
+1.  `grunt`
+2.  `mocha`
