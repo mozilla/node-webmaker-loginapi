@@ -5,7 +5,9 @@ module.exports = function( grunt ) {
     jshint: {
       files: [
         "Gruntfile.js",
-        "index.js"
+        "index.js",
+        "testServer.js",
+        "test/*.js"
       ]
     }
   });
