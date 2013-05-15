@@ -19,13 +19,15 @@
     "url": "https://github.com/mozilla/node-webmaker-loginapi.git"
   },
   "dependencies": {
-    "request": "2.21.0"
+    "request": "2.20.0"
   },
   "devDependencies": {
+    "express": "~3.2.0",
     "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.4.3"
+    "grunt-contrib-jshint": "~0.4.3",
+    "mocha": "~1.9.0"
   },
   "scripts": {
-    "test": "grunt"
+    "test": "grunt && mocha"
   }
 }
