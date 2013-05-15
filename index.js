@@ -16,6 +16,7 @@
 
 // Global requires
 var request = require( "request" ),
+    Fogin = require( "./test/Fogin.js" ),
     url = require( "url" );
 
 // Module.exports
@@ -35,6 +36,8 @@ module.exports = function ( rawUrl ) {
   };
 
   return {
+    Fogin: Fogin,
+
     getUser: function ( id, callback ) {
       request({
         auth: {
@@ -57,6 +60,7 @@ module.exports = function ( rawUrl ) {
         callback( null, body.user );
       });
     },
+
     isAdmin: function ( id, callback ) {
       request({
         auth: {
