@@ -34,8 +34,8 @@ function startServer( options, done ) {
   }, done );
 }
 
-function stopServer() {
-  Fogin.stop();
+function stopServer( done ) {
+  Fogin.stop( done );
 }
 
 
@@ -44,8 +44,8 @@ describe( "getUser() method", function() {
     startServer( null, done );
   });
 
-  after( function() {
-    stopServer();
+  after( function( done ) {
+    stopServer( done );
   });
 
   it( "should return the user object if the user exists", function ( done ) {
@@ -71,8 +71,8 @@ describe( "isAdmin() method", function() {
     startServer( null, done );
   });
 
-  after( function() {
-    stopServer();
+  after( function( done ) {
+    stopServer( done );
   });
 
   it( "should return true/false if the user exists", function ( done ) {
@@ -98,8 +98,8 @@ describe( "Auth failures", function() {
     startServer( { username: "wrong", password: "wrong", port: port }, done );
   });
 
-  after( function() {
-    stopServer();
+  after( function( done ) {
+    stopServer( done );
   });
 
   it( "should return a specific error string if the basicauth fails", function ( done ) {
