@@ -128,11 +128,14 @@ module.exports = {
     });
   },
 
-  stop: function() {
+  stop: function( callback ) {
+    callback = callback || function(){};
     if ( !server ) {
       return;
     }
-    server.close();
-    server = null;
+    server.close( function() {
+      server = null;
+      callback();
+    });
   }
 };
