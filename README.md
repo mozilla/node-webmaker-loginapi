@@ -7,13 +7,37 @@ Setup is easy!  Add to your package.json and run `npm install`.
 
 ## Integration
 
-Pass the module an http address including a user/pass according to the `http` uri scheme:
+Pass the module:
 
-`http://user:pass@webmakerServer.foo`
+1. An http address including a user/pass according to the `http` uri scheme: `http://user:pass@webmakerServer.foo`
+
+2. Your app's express instance
 
 i.e. 
 
-`require( "webmaker-loginapi" )( "http://admin:roflcoptor@login.wm.org" )`
+`require( "webmaker-loginapi" )( "http://admin:roflcoptor@login.wm.org", expressApp )`
+
+## API Exposure
+
+By passing the express object to this module, you are automatically adding a proxy to this module's `getUser` method through the following route:
+
+```javascript
+app.get( "/user/:userid", function( req, res ) {
+  loginAPI.getUser(req.param( 'userid' ), function( err, user ) {
+    if ( err || !user ) {
+      return res.json( 404, {
+      status: "failed",
+      reason: ( err || "user not defined" )
+      });
+    }
+    req.session.webmakerid = user.subdomain;
+    res.json( 200, {
+      status: "okay",
+      user: user
+    });
+  });
+});
+```
 
 ## Usage
 
