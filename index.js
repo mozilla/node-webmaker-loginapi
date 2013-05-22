@@ -20,7 +20,24 @@ var request = require( "request" ),
     url = require( "url" );
 
 // Module.exports
-module.exports = function ( rawUrl ) {
+  module.exports = function ( app, rawUrl ) {
+
+  app.get( "/user/:userid", function( req, res ) {
+    getUser(req.param( 'userid' ), function( err, user ) {
+      if ( err || !user ) {
+        return res.json({
+        status: "failed",
+        reason: ( err || "user not defined" )
+        });
+      }
+    req.session.webmakerid = user.subdomain;
+    res.json({
+      status: "okay",
+      user: user
+      });
+    });
+  });
+
   var parsedUrl = url.parse( rawUrl ),
       // Force a trailing slash
       webmakerUrl = parsedUrl.href.replace( /\/$/, '/' ),
@@ -35,10 +52,8 @@ module.exports = function ( rawUrl ) {
     pass: authBits[1]
   };
 
-  return {
-    Fogin: Fogin,
 
-    getUser: function ( id, callback ) {
+    function getUser ( id, callback ) {
       request({
         auth: {
           username: authBits.user,
@@ -59,9 +74,9 @@ module.exports = function ( rawUrl ) {
 
         callback( null, body.user );
       });
-    },
+    }
 
-    isAdmin: function ( id, callback ) {
+    function  isAdmin ( id, callback ) {
       request({
         auth: {
           username: authBits.user,
@@ -83,5 +98,6 @@ module.exports = function ( rawUrl ) {
           callback( null, body.isAdmin );
         });
     }
-  };
+
+  return { Fogin: Fogin, getUser: getUser , isAdmin: isAdmin };
 };
