@@ -20,23 +20,23 @@ var request = require( "request" ),
     url = require( "url" );
 
 // Module.exports
-module.exports = function ( app, rawUrl ) {
+  module.exports = function ( app, rawUrl ) {
 
-app.get( "/user/:userid", function( req, res ) {
-  getUser(req.param('userid'), function(err, user) {
-    if(err || !user) {
-      return res.json({
+  app.get( "/user/:userid", function( req, res ) {
+    getUser(req.param( 'userid' ), function( err, user ) {
+      if ( err || !user ) {
+        return res.json({
         status: "failed",
-        reason: (err || "user not defined")
-      });
-    }
+        reason: ( err || "user not defined" )
+        });
+      }
     req.session.webmakerid = user.subdomain;
     res.json({
       status: "okay",
       user: user
+      });
     });
   });
-});
 
   var parsedUrl = url.parse( rawUrl ),
       // Force a trailing slash
@@ -53,7 +53,7 @@ app.get( "/user/:userid", function( req, res ) {
   };
 
 
-function getUser ( id, callback ) {
+    function getUser ( id, callback ) {
       request({
         auth: {
           username: authBits.user,
