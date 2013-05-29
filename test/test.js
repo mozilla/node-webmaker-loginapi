@@ -18,7 +18,8 @@ var assert = require( 'assert' ),
     port = 5556,
     username = 'username',
     password = 'password',
-    login = require ( '../index.js' )( 'http://' + username + ':' + password + '@localhost:' + port ),
+    express = require( "express" )(),
+    login = require ( '../index.js' )( 'http://' + username + ':' + password + '@localhost:' + port, express ),
     Fogin = login.Fogin;
 
 function startServer( options, done ) {
