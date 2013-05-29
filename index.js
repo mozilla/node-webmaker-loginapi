@@ -20,7 +20,7 @@ var request = require( "request" ),
     url = require( "url" );
 
 // Module.exports
-module.exports = function ( rawUrl ) {
+module.exports = function ( app, rawUrl ) {
   var parsedUrl = url.parse( rawUrl ),
       // Force a trailing slash
       webmakerUrl = parsedUrl.href.replace( /\/$/, '/' ),
@@ -35,9 +35,7 @@ module.exports = function ( rawUrl ) {
     pass: authBits[1]
   };
 
-  return {
-    Fogin: Fogin,
-
+  var loginAPI = {
     getUser: function ( id, callback ) {
       request({
         auth: {
@@ -60,7 +58,6 @@ module.exports = function ( rawUrl ) {
         callback( null, body.user );
       });
     },
-
     isAdmin: function ( id, callback ) {
       request({
         auth: {
@@ -72,16 +69,39 @@ module.exports = function ( rawUrl ) {
         uri: webmakerUrl + "isAdmin?id=" + id,
         json: true
       }, function ( error, response, body ) {
-          if ( response.statusCode == 401 ) {
-            return callback( "Authentication failed!" );
-          }
+        if ( response.statusCode == 401 ) {
+          return callback( "Authentication failed!" );
+        }
 
-          if ( error || body.error ) {
-            return callback( error || body.error );
-          }
+        if ( error || body.error ) {
+          return callback( error || body.error );
+        }
 
-          callback( null, body.isAdmin );
-        });
+        callback( null, body.isAdmin );
+      });
     }
+  }; // END LoginAPI
+
+  // Routes declaration
+  app.get( "/user/:userid", function( req, res ) {
+    loginAPI.getUser(req.param( 'userid' ), function( err, user ) {
+      if ( err || !user ) {
+        return res.json( 404, {
+          status: "failed",
+          reason: ( err || "user not found" )
+        });
+      }
+      req.session.username = user.username;
+      res.json( 200, {
+        status: "okay",
+        user: user
+      });
+    });
+  });
+
+  return {
+    Fogin: Fogin, 
+    getUser: loginAPI.getUser,
+    isAdmin: loginAPI.isAdmin
   };
 };
