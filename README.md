@@ -19,18 +19,18 @@ i.e.
 
 ## API Exposure
 
-By passing the express object to this module, you are automatically adding a proxy to this module's `getUser` method through the following route:
+By passing the express object to this module, you are automatically adding a route that proxies to this module's `getUser` method.  It also sets a session variable called "username":
 
 ```javascript
 app.get( "/user/:userid", function( req, res ) {
   loginAPI.getUser(req.param( 'userid' ), function( err, user ) {
     if ( err || !user ) {
       return res.json( 404, {
-      status: "failed",
-      reason: ( err || "user not defined" )
+        status: "failed",
+        reason: ( err || "user not defined" )
       });
     }
-    req.session.webmakerid = user.subdomain;
+    req.session.username = user.username;
     res.json( 200, {
       status: "okay",
       user: user
@@ -39,7 +39,7 @@ app.get( "/user/:userid", function( req, res ) {
 });
 ```
 
-## Usage
+## Methods
 
 The module returns an object with two methods:
 

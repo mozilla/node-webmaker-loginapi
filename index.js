@@ -87,11 +87,11 @@ module.exports = function ( rawUrl, app ) {
     loginAPI.getUser(req.param( 'userid' ), function( err, user ) {
       if ( err || !user ) {
         return res.json( 404, {
-        status: "failed",
-        reason: ( err || "user not defined" )
+          status: "failed",
+          reason: ( err || "user not found" )
         });
       }
-      req.session.webmakerid = user.subdomain;
+      req.session.username = user.username;
       res.json( 200, {
         status: "okay",
         user: user
@@ -99,5 +99,9 @@ module.exports = function ( rawUrl, app ) {
     });
   });
 
-  return { Fogin: Fogin, getUser: loginAPI.getUser , isAdmin: loginAPI.isAdmin };
+  return {
+    Fogin: Fogin, 
+    getUser: loginAPI.getUser,
+    isAdmin: loginAPI.isAdmin
+  };
 };
