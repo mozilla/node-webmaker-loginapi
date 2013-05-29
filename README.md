@@ -19,25 +19,9 @@ i.e.
 
 ## API Exposure
 
-By passing the express object to this module, you are automatically adding a route that proxies to this module's `getUser` method.  It also sets a session variable called "username":
+Instantiating this module creates the `GET /user/:id` route in the parent app, which proxies to this module's `getUser` method and sets `req.session.username` to match the `user.username` returned by `getUser`. 
 
-```javascript
-app.get( "/user/:userid", function( req, res ) {
-  loginAPI.getUser(req.param( 'userid' ), function( err, user ) {
-    if ( err || !user ) {
-      return res.json( 404, {
-        status: "failed",
-        reason: ( err || "user not defined" )
-      });
-    }
-    req.session.username = user.username;
-    res.json( 200, {
-      status: "okay",
-      user: user
-    });
-  });
-});
-```
+The route will return `{ status: "okay", user: user}` when successful, and `{ status: "failure", reason: "error message"}` when not.
 
 ## Methods
 

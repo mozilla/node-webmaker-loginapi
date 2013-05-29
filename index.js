@@ -20,7 +20,7 @@ var request = require( "request" ),
     url = require( "url" );
 
 // Module.exports
-module.exports = function ( rawUrl, app ) {
+module.exports = function ( app, rawUrl ) {
   var parsedUrl = url.parse( rawUrl ),
       // Force a trailing slash
       webmakerUrl = parsedUrl.href.replace( /\/$/, '/' ),

@@ -28,6 +28,6 @@
     "mocha": "~1.9.0"
   },
   "scripts": {
-    "test": "grunt && mocha"
+    "test": "grunt && mocha --reporter spec"
   }
 }
