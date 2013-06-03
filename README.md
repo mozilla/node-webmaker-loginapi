@@ -15,7 +15,7 @@ Pass the module:
 
 i.e. 
 
-`require( "webmaker-loginapi" )( "http://admin:roflcoptor@login.wm.org", expressApp )`
+`require( "webmaker-loginapi" )( expressApp, "http://admin:roflcoptor@login.wm.org" )`
 
 ## API Exposure
 
