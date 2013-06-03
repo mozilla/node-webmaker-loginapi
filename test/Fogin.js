@@ -36,13 +36,13 @@
  *   logins: [
  *     {
  *       email: "admin@somewhere.com",
- *       subdomain: "admin",
+ *       username: "admin",
  *       fullName: "An Admin",
  *       isAdmin: true
  *     },
  *     {
  *       email: "not-admin@somewhere.com",
- *       subdomain: "notadmin",
+ *       username: "notadmin",
  *       fullName: "Not Admin",
  *       isAdmin: false
  *     }
@@ -60,7 +60,7 @@ function createLogin( user ) {
   loginStore[ user.email ] = {
     _id: user.email,
     email: user.email,
-    subdomain: user.subdomain || "default",
+    username: user.username || "default",
     fullName: user.fullName || "default",
     displayName: user.fullName || "default",
     createdAt: now,
@@ -84,7 +84,7 @@ module.exports = {
         app = express(),
         defaultLogin = {
           email: "default@webmaker.org",
-          subdomain: "subdomain",
+          username: "username",
           fullName: "John Smith",
           isAdmin: true
         },
