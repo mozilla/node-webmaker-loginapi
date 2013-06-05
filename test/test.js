@@ -117,3 +117,63 @@ describe( "Auth failures", function() {
     });
   });
 });
+
+describe( "Good invocations", function() {
+  var fakeExpress = { get: function() {} },
+      login = require( "../index.js" );
+
+  it( "http://g:d@example.org should work", function( done ) {
+    assert( login( fakeExpress, "http://g:d@example.org" ) );
+    done();
+  });
+
+  it( "https://g:d@example.org should work", function( done ) {
+    assert( login( fakeExpress, "https://g:d@example.org" ) );
+    done();
+  });
+
+  it( "http://g:d@example.org/ should work", function( done ) {
+    assert( login( fakeExpress, "http://g:d@example.org/" ) );
+    done();
+  });
+});
+
+describe( "Bad invocations", function() {
+  var fakeExpress = { get: function() {} },
+      login = require( "../index.js" );
+
+  it( "no express app should throw", function( done ) {
+    assert.throws( function() {
+      login()
+    }, /express app was not passed into function/ );
+    done();
+  });
+
+  it( "no URI should throw", function( done ) {
+    assert.throws( function() {
+      login( fakeExpress )
+    }, /URI was not passed into function/ );
+    done();
+  });
+
+  it( "http://example.org should throw", function( done ) {
+    assert.throws( function() {
+      login( fakeExpress, "http://example.org" )
+    }, /authentication must be present in URI/ );
+    done();
+  });
+
+  it( "g:d@example.org should throw", function( done ) {
+    assert.throws( function() {
+      login( fakeExpress, "g:d@example.org" )
+    }, /URI protocol must be 'https:' or 'http:'/ );
+    done();
+  });
+
+  it( "file://g:d@example.org should throw", function( done ) {
+    assert.throws( function() {
+      login( fakeExpress, "file://g:d@example.org" )
+    }, /URI protocol must be 'https:' or 'http:'/ );
+    done();
+  });
+});
