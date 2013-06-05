@@ -1,6 +1,6 @@
-/* 
+/*
   Copyright 2013 Mozilla Foundation
- 
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -16,20 +16,29 @@
 
 // Global requires
 var request = require( "request" ),
-    Fogin = require( "./test/Fogin.js" ),
-    url = require( "url" );
+    Fogin = require( "./test/Fogin.js" );
 
 // Module.exports
 module.exports = function ( app, rawUrl ) {
-  var parsedUrl = url.parse( rawUrl ),
-      // Force a trailing slash
-      webmakerUrl = parsedUrl.href.replace( /\/$/, '/' ),
-      authBits = parsedUrl.auth.split(":");
-
-  if ( parsedUrl.protocol !== ("http:" || "https:") ) {
-    return console.error("Webmaker-LoginAPI ERROR: Invalid uri!");
+  if (!app) {
+    throw new Error("webmaker-loginapi error: express app was not passed into function");
   }
 
+  if (!rawUrl) {
+    throw new Error("webmaker-loginapi error: URI was not passed into function");
+  }
+
+  var parsedUrl = require( "url" ).parse( rawUrl );
+
+  if ( parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:" ) {
+    throw new Error("webmaker-loginapi error: URI protocol must be 'https:' or 'http:'");
+  }
+  if ( !parsedUrl.auth || parsedUrl.auth.split(":").length != 2 ) {
+    throw new Error("webmaker-loginapi error: authentication must be present in URI");
+  }
+
+  var authBits = parsedUrl.auth.split(":"),
+      webmakerUrl = parsedUrl.href;
   authBits = {
     user: authBits[0],
     pass: authBits[1]
@@ -100,7 +109,7 @@ module.exports = function ( app, rawUrl ) {
   });
 
   return {
-    Fogin: Fogin, 
+    Fogin: Fogin,
     getUser: loginAPI.getUser,
     isAdmin: loginAPI.isAdmin
   };

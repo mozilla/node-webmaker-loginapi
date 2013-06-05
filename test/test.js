@@ -15,11 +15,12 @@
 */
 
 var assert = require( 'assert' ),
+    fakeExpress = { get: function() {} },
+    loginModule = require( "../index.js" ),
     port = 5556,
     username = 'username',
     password = 'password',
-    express = require( "express" )(),
-    login = require ( '../index.js' )( express, 'http://' + username + ':' + password + '@localhost:' + port ),
+    login = loginModule( fakeExpress, 'http://' + username + ':' + password + '@localhost:' + port ),
     Fogin = login.Fogin;
 
 function startServer( options, done ) {
@@ -115,5 +116,59 @@ describe( "Auth failures", function() {
       assert.equal( error, "Authentication failed!" );
       done();
     });
+  });
+});
+
+describe( "Good invocations", function() {
+  it( "http://g:d@example.org should work", function( done ) {
+    assert( loginModule( fakeExpress, "http://g:d@example.org" ) );
+    done();
+  });
+
+  it( "https://g:d@example.org should work", function( done ) {
+    assert( loginModule( fakeExpress, "https://g:d@example.org" ) );
+    done();
+  });
+
+  it( "http://g:d@example.org/ should work", function( done ) {
+    assert( loginModule( fakeExpress, "http://g:d@example.org/" ) );
+    done();
+  });
+});
+
+describe( "Bad invocations", function() {
+  it( "no express app should throw", function( done ) {
+    assert.throws( function() {
+      loginModule();
+    }, /express app was not passed into function/ );
+    done();
+  });
+
+  it( "no URI should throw", function( done ) {
+    assert.throws( function() {
+      loginModule( fakeExpress );
+    }, /URI was not passed into function/ );
+    done();
+  });
+
+  it( "http://example.org should throw", function( done ) {
+    assert.throws( function() {
+      loginModule( fakeExpress, "http://example.org" );
+    }, /authentication must be present in URI/ );
+    done();
+  });
+
+  it( "g:d@example.org should throw", function( done ) {
+    assert.throws( function() {
+      loginModule( fakeExpress, "g:d@example.org" );
+    }, /URI protocol must be 'https:' or 'http:'/ );
+    done();
+  });
+
+  it( "file://g:d@example.org should throw", function( done ) {
+    assert.throws( function() {
+      loginModule( fakeExpress, "file://g:d@example.org" );
+    }, /URI protocol must be 'https:' or 'http:'/ );
+    done();
   });
 });
