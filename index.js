@@ -14,11 +14,15 @@
   limitations under the License.
 */
 
-// Global requires
+/**
+ * Global requires
+ **/
 var request = require( "request" ),
     Fogin = require( "./test/Fogin.js" );
 
-// Module.exports
+/**
+ *  Module.exports
+ **/
 module.exports = function ( app, rawUrl ) {
   if (!app) {
     throw new Error("webmaker-loginapi error: express app was not passed into function");
@@ -91,20 +95,35 @@ module.exports = function ( app, rawUrl ) {
     }
   }; // END LoginAPI
 
-  // Routes declaration
+  /**
+   * Routes declaration
+   **/
   app.get( "/user/:userid", function( req, res ) {
-    loginAPI.getUser(req.param( 'userid' ), function( err, user ) {
-      if ( err || !user ) {
+    var personaUser = req.session.email;
+
+    // Check for authenticated user
+    if ( !personaUser ) {
+      return res.json( 403, {
+        status: "failed",
+        reason: "authentication failure"
+      });
+    }
+
+    loginAPI.getUser( personaUser, function( err, webmaker ) {
+      // Error handling
+      if ( err || !webmaker ) {
         return res.json( 404, {
           status: "failed",
-          reason: ( err || "user not found" )
+          reason: ( err || "webmaker not found" )
         });
       }
-      req.session.username = user.username;
-      res.json( 200, {
+
+      // Set session
+      req.session.username = webmaker.username;
+      return res.json( 200, {
         status: "okay",
-        user: user
-      });
+        user: webmaker
+      });            
     });
   });
 
