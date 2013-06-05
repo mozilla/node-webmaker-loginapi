@@ -16,8 +16,7 @@
 
 // Global requires
 var request = require( "request" ),
-    Fogin = require( "./test/Fogin.js" ),
-    url = require( "url" );
+    Fogin = require( "./test/Fogin.js" );
 
 // Module.exports
 module.exports = function ( app, rawUrl ) {
@@ -29,7 +28,7 @@ module.exports = function ( app, rawUrl ) {
     throw new Error("webmaker-loginapi error: URI was not passed into function");
   }
 
-  var parsedUrl = url.parse( rawUrl );
+  var parsedUrl = require( "url" ).parse( rawUrl );
 
   if ( parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:" ) {
     throw new Error("webmaker-loginapi error: URI protocol must be 'https:' or 'http:'");
