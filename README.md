@@ -13,15 +13,19 @@ Pass the module:
 
 2. Your app's express instance
 
+    NOTE: Do not call the constructor-function returned by the `require()` until all of your server's general middleware has been declared.
+
 i.e. 
 
-`require( "webmaker-loginapi" )( expressApp, "http://admin:roflcoptor@login.wm.org" )`
+```javascript
+var loginHandle = require( "webmaker-loginapi" )( expressApp, "http://admin:roflcoptor@login.wm.org" );
+```
 
 ## API Exposure
 
-Instantiating this module creates the `GET /user/:id` route in the parent app, which proxies to this module's `getUser` method and sets `req.session.username` to match the `user.username` returned by `getUser`. 
+Instantiating this module creates the `GET /user/:id` route in the parent app for use during SSO integration. It exposes the Webmaker username associated with valid persona credentials as `req.session.username`.
 
-The route will return `{ status: "okay", user: user}` when successful, and `{ status: "failure", reason: "error message"}` when not.
+The route will return `{ status: "okay", user: user }` when successful, and `{ status: "failure", reason: "error message" }` when not.
 
 ## Methods
 
