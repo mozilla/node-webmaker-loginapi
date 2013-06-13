@@ -60,12 +60,19 @@ module.exports = function ( app, rawUrl ) {
         uri: webmakerUrl + "user/" + id,
         json: true
       }, function ( error, response, body ) {
-        if ( response.statusCode == 401 ) {
-          return callback( "Authentication failed!" );
+        // Shallow error check
+        if ( error ) {
+          return callback( error );
         }
 
-        if ( error || body.error ) {
-          return callback( error || body.error );
+        // Deep error check
+        if ( body && body.error ) {
+          return callback( body.error );
+        }
+
+        // Auth error check
+        if ( response.statusCode == 401 ) {
+          return callback( "Authentication failed!" );
         }
 
         callback( null, body.user );
@@ -82,12 +89,19 @@ module.exports = function ( app, rawUrl ) {
         uri: webmakerUrl + "isAdmin?id=" + id,
         json: true
       }, function ( error, response, body ) {
-        if ( response.statusCode == 401 ) {
-          return callback( "Authentication failed!" );
+        // Shallow error check
+        if ( error ) {
+          return callback( error );
         }
 
-        if ( error || body.error ) {
-          return callback( error || body.error );
+        // Deep error check
+        if ( body && body.error ) {
+          return callback( body.error );
+        }
+
+        // Auth check
+        if ( response.statusCode == 401 ) {
+          return callback( "Authentication failed!" );
         }
 
         callback( null, body.isAdmin );
