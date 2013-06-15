@@ -1,6 +1,6 @@
 {
   "name": "webmaker-loginapi",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Mozilla Webmaker SSO helper & integration module",
   "keywords": [
     "mozilla",
