@@ -9,16 +9,34 @@ Setup is easy!  Add to your package.json and run `npm install`.
 
 Pass the module:
 
-1. An http address including a user/pass according to the `http` uri scheme: `http://user:pass@webmakerServer.foo`
-
-2. Your app's express instance
+1. Your app's express instance
 
     NOTE: Do not call the constructor-function returned by the `require()` until all of your server's general middleware has been declared.
 
-i.e. 
+2. An options object that will pass options used for [Express Persona](https://github.com/jbuck/express-persona) and our SSO integration.
+
+### Required Options
+
+* `audience` - The URL of your express app when viewed in a browser. Must include the protocol, hostname, and port.
+  * Example: `http://example.org:80`, `https://example.org:443`
+* `loginURL` - An http address including a user/pass according to the `http` uri scheme.
+  * Exmaple: - `http://user:pass@webmakerServer.foo`
+
+### Optional Options
+* `verifyResponse` - A callback used for custom actions needed for individual apps. It is returned:
+  * `res` - The server response object.
+  * `data` - Contains information useful to determine app specific actions such as:
+    ** `email` - The email of the Persona Users
+    ** `user` - An object containing information about this Webmaker user.
+    ** `status` - Just general information if things didn't fail.
+
+i.e.
 
 ```javascript
-var loginHandle = require( "webmaker-loginapi" )( expressApp, "http://admin:roflcoptor@login.wm.org" );
+var loginHandle = require( "webmaker-loginapi" )( expressApp, {
+  loginURL: "http://admin:roflcoptor@login.wm.org",
+  audience: "http://example.org:443"
+});
 ```
 
 ## API Exposure

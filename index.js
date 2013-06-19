@@ -18,34 +18,38 @@
  * Global requires
  **/
 var request = require( "request" ),
-    Fogin = require( "./test/Fogin.js" );
+    Fogin = require( "./test/Fogin.js" ),
+    persona = require( "express-persona" );
 
 /**
  *  Module.exports
  **/
-module.exports = function ( app, rawUrl ) {
-  if (!app) {
+module.exports = function ( app, options ) {
+  options = options || {};
+
+  if ( !app ) {
     throw new Error("webmaker-loginapi error: express app was not passed into function");
   }
 
-  if (!rawUrl) {
+  if ( !options.loginURL ) {
     throw new Error("webmaker-loginapi error: URI was not passed into function");
   }
 
-  var parsedUrl = require( "url" ).parse( rawUrl );
+  var parsedUrl = require( "url" ).parse( options.loginURL );
 
   if ( parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:" ) {
-    throw new Error("webmaker-loginapi error: URI protocol must be 'https:' or 'http:'");
+    throw new Error( "webmaker-loginapi error: URI protocol must be 'https:' or 'http:'" );
   }
-  if ( !parsedUrl.auth || parsedUrl.auth.split(":").length != 2 ) {
-    throw new Error("webmaker-loginapi error: authentication must be present in URI");
+  if ( !parsedUrl.auth || parsedUrl.auth.split( ":" ).length != 2 ) {
+    throw new Error( "webmaker-loginapi error: authentication must be present in URI" );
   }
 
-  var authBits = parsedUrl.auth.split(":"),
+  var authBits = parsedUrl.auth.split( ":" ),
       webmakerUrl = parsedUrl.href;
+
   authBits = {
-    user: authBits[0],
-    pass: authBits[1]
+    user: authBits[ 0 ],
+    pass: authBits[ 1 ]
   };
 
   var loginAPI = {
@@ -107,38 +111,60 @@ module.exports = function ( app, rawUrl ) {
         callback( null, body.isAdmin );
       });
     }
-  }; // END LoginAPI
+  };
 
-  /**
-   * Routes declaration
-   **/
-  app.get( "/user/:userid", function( req, res ) {
-    var personaUser = req.session.email;
-
-    // Check for authenticated user
-    if ( !personaUser ) {
-      return res.json( 403, {
-        status: "failed",
-        reason: "authentication failure"
-      });
-    }
-
-    loginAPI.getUser( personaUser, function( err, webmaker ) {
-      // Error handling
-      if ( err || !webmaker ) {
-        return res.json( 404, {
-          status: "failed",
-          reason: ( err || "webmaker not found" )
-        });
+  persona( app, {
+    verifyResponse: function( error, req, res, email ) {
+      if ( error ) {
+        return res.json( { status: "failure", reason: error } );
       }
 
-      // Set session
-      req.session.username = webmaker.username;
-      return res.json( 200, {
-        status: "okay",
-        user: webmaker
-      });            
-    });
+      loginAPI.getUser( email, function( err, webmaker ) {
+
+        if ( err ) {
+          return res.json( 500, {
+            status: "failure",
+            reason: err,
+            email: email
+          });
+        }
+
+        if ( !webmaker ) {
+          return res.json( 404, {
+            status: "failure",
+            reason: "webmaker not found",
+            email: email
+          });
+        }
+
+        // Set session
+        req.session.username = webmaker.username;
+        if ( options.verifyResponse ) {
+          options.verifyResponse( res, {
+            status: "okay",
+            user: webmaker,
+            email: email
+          });
+          return;
+        }
+
+        return res.json( 200, {
+          status: "okay",
+          user: webmaker,
+          email: email
+        });
+      });
+    },
+    logoutResponse: function( error, req, res ) {
+      delete req.session.username;
+
+      if ( error ) {
+        return res.json( { status: "failure", reason: error } );
+      }
+
+      res.json( { status: "okay" } );
+    },
+    audience: options.audience
   });
 
   return {
