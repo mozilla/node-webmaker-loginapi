@@ -141,6 +141,35 @@ module.exports = function ( app, rawUrl ) {
     });
   });
 
+  // Used to remove the user from session after SSO logout occurs.
+  app.post( "/user/:userid", function( req, res ) {
+    var personaUser = req.session.email;
+
+    // Check for authenticated user
+    if ( !personaUser ) {
+      return res.json( 403, {
+        status: "failed",
+        reason: "authentication failure"
+      });
+    }
+
+    loginAPI.getUser( personaUser, function( err, webmaker ) {
+      // Error handling
+      if ( err || !webmaker ) {
+        return res.json( 404, {
+          status: "failed",
+          reason: ( err || "webmaker not found" )
+        });
+      }
+
+      // Remove from session
+      req.session.username = null;
+      return res.json( 200, {
+        status: "okay"
+      });            
+    });
+  });
+
   return {
     Fogin: Fogin,
     getUser: loginAPI.getUser,
