@@ -164,7 +164,8 @@ module.exports = function ( app, options ) {
 
       res.json( { status: "okay" } );
     },
-    audience: options.audience
+    audience: options.audience,
+    middleware: options.middleware
   });
 
   return {

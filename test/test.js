@@ -15,12 +15,18 @@
 */
 
 var assert = require( 'assert' ),
-    fakeExpress = { get: function() {} },
+    fakeExpress = {
+      get: function() {},
+      post: function() {}
+    },
     loginModule = require( "../index.js" ),
     port = 5556,
     username = 'username',
     password = 'password',
-    login = loginModule( fakeExpress, 'http://' + username + ':' + password + '@localhost:' + port ),
+    login = loginModule( fakeExpress, {
+      loginURL: 'http://' + username + ':' + password + '@localhost:' + port,
+      audience: 'http://localhost:' + port
+    }),
     Fogin = login.Fogin;
 
 function startServer( options, done ) {
@@ -121,17 +127,17 @@ describe( "Auth failures", function() {
 
 describe( "Good invocations", function() {
   it( "http://g:d@example.org should work", function( done ) {
-    assert( loginModule( fakeExpress, "http://g:d@example.org" ) );
+    assert( loginModule( fakeExpress, { loginURL: "http://g:d@example.org" } ) );
     done();
   });
 
   it( "https://g:d@example.org should work", function( done ) {
-    assert( loginModule( fakeExpress, "https://g:d@example.org" ) );
+    assert( loginModule( fakeExpress, { loginURL: "https://g:d@example.org" } ) );
     done();
   });
 
   it( "http://g:d@example.org/ should work", function( done ) {
-    assert( loginModule( fakeExpress, "http://g:d@example.org/" ) );
+    assert( loginModule( fakeExpress, { loginURL: "http://g:d@example.org/" } ) );
     done();
   });
 });
@@ -153,21 +159,21 @@ describe( "Bad invocations", function() {
 
   it( "http://example.org should throw", function( done ) {
     assert.throws( function() {
-      loginModule( fakeExpress, "http://example.org" );
+      loginModule( fakeExpress, { loginURL: "http://example.org" } );
     }, /authentication must be present in URI/ );
     done();
   });
 
   it( "g:d@example.org should throw", function( done ) {
     assert.throws( function() {
-      loginModule( fakeExpress, "g:d@example.org" );
+      loginModule( fakeExpress, { loginURL: "g:d@example.org" } );
     }, /URI protocol must be 'https:' or 'http:'/ );
     done();
   });
 
   it( "file://g:d@example.org should throw", function( done ) {
     assert.throws( function() {
-      loginModule( fakeExpress, "file://g:d@example.org" );
+      loginModule( fakeExpress, { loginURL: "file://g:d@example.org" } );
     }, /URI protocol must be 'https:' or 'http:'/ );
     done();
   });
