@@ -115,6 +115,35 @@ module.exports = function ( app, options ) {
 
         callback( null, body.isAdmin );
       });
+    },
+    isCollaborator: function ( id, callback ) {
+      request({
+        auth: {
+          username: authBits.user,
+          password: authBits.pass,
+          sendImmediately: false
+        },
+        method: "GET",
+        uri: webmakerUrl + "isCollaborator?id=" + id,
+        json: true
+      }, function ( error, response, body ) {
+        // Shallow error check
+        if ( error ) {
+          return callback( error );
+        }
+
+        // Deep error check
+        if ( body && body.error ) {
+          return callback( body.error );
+        }
+
+        // Auth check
+        if ( response.statusCode == 401 ) {
+          return callback( "Authentication failed!" );
+        }
+
+        callback( null, body.isCollaborator );
+      });
     }
   };
 
@@ -176,6 +205,7 @@ module.exports = function ( app, options ) {
   return {
     Fogin: Fogin,
     getUser: loginAPI.getUser,
-    isAdmin: loginAPI.isAdmin
+    isAdmin: loginAPI.isAdmin,
+    isCollaborator: loginAPI.isCollaborator
   };
 };
