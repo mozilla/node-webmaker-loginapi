@@ -144,6 +144,7 @@ module.exports = function ( app, options ) {
 
         // Set session
         req.session.username = webmaker.username;
+        req.session.id = webmaker.id;
         if ( options.verifyResponse ) {
           options.verifyResponse( res, {
             status: "okay",
@@ -162,6 +163,7 @@ module.exports = function ( app, options ) {
     },
     logoutResponse: function( error, req, res ) {
       delete req.session.username;
+      delete req.session.id;
 
       if ( error ) {
         return res.json( { status: "failure", reason: error } );
