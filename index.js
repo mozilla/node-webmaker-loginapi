@@ -21,6 +21,8 @@ var request = require( "request" ),
     Fogin = require( "./test/Fogin.js" ),
     persona = require( "express-persona" );
 
+var USERNAME_REGEX = /^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\-\_]{1,20}$/;
+
 /**
  *  Module.exports
  **/
@@ -54,6 +56,10 @@ module.exports = function ( app, options ) {
 
   var loginAPI = {
     getUser: function ( id, callback ) {
+      if ( !USERNAME_REGEX.test( id ) ) {
+        // invalid username
+        return callback( "Invalid Username" );
+      }
       request({
         auth: {
           username: authBits.user,
@@ -88,6 +94,10 @@ module.exports = function ( app, options ) {
       });
     },
     isAdmin: function ( id, callback ) {
+      if ( !USERNAME_REGEX.test( id ) ) {
+        // invalid username
+        return callback( "Invalid Username" );
+      }
       request({
         auth: {
           username: authBits.user,
