@@ -64,9 +64,9 @@ describe( "getUser() method", function() {
     });
   });
 
-  it( "should return a specific error string if the user doesn't exist", function ( done ) {
+  it( "should return without args if the user doesn't exist", function ( done ) {
     login.getUser( "foo@bar.com", function ( error, user ){
-      assert.ok( !!error );
+      assert.ok( !error );
       assert.equal( user, undefined );
       done();
     });
