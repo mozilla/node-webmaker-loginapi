@@ -52,19 +52,18 @@ module.exports = function ( app, options ) {
     pass: authBits[ 1 ]
   };
 
-  var loginAPI = {
-    getUser: function ( id, callback ) {
-      request({
-        auth: {
-          username: authBits.user,
-          password: authBits.pass,
-          sendImmediately: false
-        },
-        method: "GET",
-        uri: webmakerUrl + "user/" + id,
-        json: true
-      }, function ( error, response, body ) {
-        // User account wasn't found. Treat differently
+  function userRequest( query, field, callback ) {
+    request({
+      auth: {
+        username: authBits.user,
+        password: authBits.pass,
+        sendImmediately: true
+      },
+      method: "GET",
+      uri: webmakerUrl + "user/" + field + query,
+      json: true
+    }, function( error, response, body ) {
+      // User account wasn't found. Treat differently
         if ( response.statusCode === 404 ) {
           return callback();
         }
@@ -85,7 +84,21 @@ module.exports = function ( app, options ) {
         }
 
         callback( null, body.user );
-      });
+    });
+  }
+
+  var loginAPI = {
+    getUser: function ( id, callback ) {
+      userRequest( id, "", callback );
+    },
+    getUserById: function ( id, callback ) {
+      userRequest( id, "id/", callback );
+    },
+    getUserByUsername: function ( username, callback ) {
+      userRequest( username, "username/", callback );
+    },
+    getUserByEmail: function ( email, callback ) {
+      userRequest( email, "email/", callback );
     },
     isAdmin: function ( id, callback ) {
       request({
@@ -178,6 +191,9 @@ module.exports = function ( app, options ) {
   return {
     Fogin: Fogin,
     getUser: loginAPI.getUser,
+    getUserById: loginAPI.getUserById,
+    getUserByUsername: loginAPI.getUserByUsername,
+    getUserByEmail: loginAPI.getUserByEmail,
     isAdmin: loginAPI.isAdmin
   };
 };
