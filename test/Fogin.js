@@ -52,25 +52,32 @@
  */
 var express = require( "express" ),
     server,
-    loginStore = {};
+    loginStoreByEmail = {},
+    loginStoreById = {},
+    loginStoreByUsername = {};
 
 // Simulate login store. If you want to add items, do it in start().
 function createLogin( user ) {
   var now = Date.now();
-  loginStore[ user.email ] = {
-    _id: user.email,
-    email: user.email,
-    username: user.username || "default",
-    fullName: user.fullName || "default",
-    displayName: user.fullName || "default",
-    createdAt: now,
-    updatedAt: now,
-    deletedAt: null,
-    isAdmin: !!user.isAdmin,
-    isSuspended: user.isSuspended === true,
-    sendNotifications: user.sendNotifications === true,
-    sendEngagements: user.sendEngagements === true
-  };
+    userObj = {
+      id: 1,
+      _id: user.email,
+      email: user.email,
+      username: user.username || "default",
+      fullName: user.fullName || "default",
+      displayName: user.fullName || "default",
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+      isAdmin: !!user.isAdmin,
+      isSuspended: user.isSuspended === true,
+      sendNotifications: user.sendNotifications === true,
+      sendEngagements: user.sendEngagements === true
+    };
+
+  loginStoreByEmail[ userObj.email ] =
+    loginStoreById[ userObj.id ] =
+    loginStoreByUsername[ userObj.username ] = userObj;
 }
 
 module.exports = {
@@ -97,9 +104,9 @@ module.exports = {
     app.use( express.bodyParser() );
 
     // App GET USER
-    app.get( '/user/:id', basicAuth, function ( req, res ) {
-      var id = req.params.id,
-          login = loginStore[ id ];
+    app.get( '/user/id/*', basicAuth, function ( req, res ) {
+      var id = req.params[ 0 ],
+          login = loginStoreById[ id ];
 
       if ( !login ) {
         res.json( 404, { error: "User not found for ID: " + id, user: null } );
@@ -108,15 +115,27 @@ module.exports = {
       }
     });
 
-    // App isAdmin
-    app.get( '/isAdmin', basicAuth, function ( req, res ) {
-      var id = req.query.id,
-          login = loginStore[ id ];
+    // App GET USER By Email
+    app.get( '/user/email/*', basicAuth, function ( req, res ) {
+      var email = req.params[ 0 ],
+          login = loginStoreByEmail[ email ];
 
       if ( !login ) {
-        res.json( 404, { error: "User not found for ID: " + id, user: null } );
+        res.json( 404, { error: "User not found for email: " + email, user: null } );
       } else {
-        res.json({ error: null, isAdmin: login.isAdmin });
+        res.json({ user: login });
+      }
+    });
+
+    // App GET USER By Username
+    app.get( '/user/username/*', basicAuth, function ( req, res ) {
+      var username = req.params[ 0 ],
+          login = loginStoreByUsername[ username ];
+
+      if ( !login ) {
+        res.json( 404, { error: "User not found for username: " + username, user: null } );
+      } else {
+        res.json({ user: login });
       }
     });
 

@@ -47,17 +47,19 @@ The route will return `{ status: "okay", user: user }` when successful, and `{ s
 
 ## Methods
 
-The module returns an object with two methods:
+The module returns an object with three methods:
 
-`loginHandle.getUser ( id, callback )`
+`loginHandle.getUserById ( id, callback )`
 
  ...which retrieves the user model for the passed `id`, passing the callback the parameters `( errorString, userObject )` and
 
-`loginHandle.isAdmin ( id, callback )`
+`loginHandle.getUserByEmail ( email, callback )`
 
- ...which retrieves the user permissions for the passed `id`, passing the callback the parameters `( errorString, [isAdmin] )` 
+ ...which retrieves the user model for the passed `email`, passing the callback the parameters `( errorString, userObject )` and
 
-See: https://github.com/mozilla/login.webmaker.org/wiki/LoginAPI-&-User-Model
+`loginHandle.getUserByUsername ( username, callback )`
+
+ ...which retrieves the user model for the passed `username`, passing the callback the parameters `( errorString, userObject )` and
 
 ## Testing
 
