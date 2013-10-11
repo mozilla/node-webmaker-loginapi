@@ -19,7 +19,7 @@
     "url": "https://github.com/mozilla/node-webmaker-loginapi.git"
   },
   "dependencies": {
-    "express-persona": "0.0.10",
+    "express-persona": "0.1.0",
     "request": "2.21.0"
   },
   "devDependencies": {
