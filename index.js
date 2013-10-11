@@ -118,7 +118,7 @@ module.exports = function ( app, options ) {
     }
   };
 
-  persona( app, {
+  var personaOpts = {
     verifyResponse: function( error, req, res, email ) {
       if ( error ) {
         return res.json( { status: "failure", reason: error } );
@@ -170,10 +170,14 @@ module.exports = function ( app, options ) {
       }
 
       res.json( { status: "okay" } );
-    },
-    audience: options.audience,
-    middleware: options.middleware
+    }
+  };
+
+  Object.keys(options).forEach( function( key ) {
+    personaOpts[ key ] = options[ key ];
   });
+
+  persona( app, personaOpts );
 
   return {
     Fogin: Fogin,
