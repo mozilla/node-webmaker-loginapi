@@ -99,35 +99,6 @@ module.exports = function ( app, options ) {
     },
     getUserByEmail: function ( email, callback ) {
       userRequest( email, "email/", callback );
-    },
-    isAdmin: function ( id, callback ) {
-      request({
-        auth: {
-          username: authBits.user,
-          password: authBits.pass,
-          sendImmediately: false
-        },
-        method: "GET",
-        uri: webmakerUrl + "isAdmin?id=" + id,
-        json: true
-      }, function ( error, response, body ) {
-        // Shallow error check
-        if ( error ) {
-          return callback( error );
-        }
-
-        // Deep error check
-        if ( body && body.error ) {
-          return callback( body.error );
-        }
-
-        // Auth check
-        if ( response.statusCode == 401 ) {
-          return callback( "Authentication failed!" );
-        }
-
-        callback( null, body.isAdmin );
-      });
     }
   };
 
@@ -197,7 +168,6 @@ module.exports = function ( app, options ) {
     getUser: loginAPI.getUser,
     getUserById: loginAPI.getUserById,
     getUserByUsername: loginAPI.getUserByUsername,
-    getUserByEmail: loginAPI.getUserByEmail,
-    isAdmin: loginAPI.isAdmin
+    getUserByEmail: loginAPI.getUserByEmail
   };
 };

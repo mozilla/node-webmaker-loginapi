@@ -73,34 +73,6 @@ describe( "getUser() method", function() {
   });
 });
 
-
-describe( "isAdmin() method", function() {
-  before( function( done ) {
-    startServer( null, done );
-  });
-
-  after( function( done ) {
-    stopServer( done );
-  });
-
-  it( "should return true/false if the user exists", function ( done ) {
-    login.isAdmin( "foo@foo.com", function ( error, isAdmin ){
-      assert.ok( !error );
-      assert.strictEqual( typeof( isAdmin ), "boolean" );
-      done();
-    });
-  });
-
-  it( "should return an error string if the user doesn't exist", function ( done ) {
-    login.isAdmin( "foo@bar.com", function ( error, isAdmin ){
-      assert.ok( !!error );
-      assert.equal( isAdmin, undefined );
-      done();
-    });
-  });
-});
-
-
 describe( "Auth failures", function() {
   before( function( done ) {
     startServer( { username: "wrong", password: "wrong", port: port }, done );
@@ -108,13 +80,6 @@ describe( "Auth failures", function() {
 
   after( function( done ) {
     stopServer( done );
-  });
-
-  it( "should return a specific error string if the basicauth fails", function ( done ) {
-    login.isAdmin( "foo@foo.com", function ( error, user ){
-      assert.equal( error, "Authentication failed!" );
-      done();
-    });
   });
 
   it( "should return a specific error string if the basicauth fails", function ( done ) {
