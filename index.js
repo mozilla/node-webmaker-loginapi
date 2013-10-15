@@ -158,7 +158,9 @@ module.exports = function ( app, options ) {
   };
 
   Object.keys(options).forEach( function( key ) {
-    personaOpts[ key ] = options[ key ];
+    if ( !personaOpts[ key ] ) {
+      personaOpts[ key ] = options[ key ];
+    }
   });
 
   persona( app, personaOpts );
