@@ -63,14 +63,14 @@ module.exports = function ( app, options ) {
       uri: webmakerUrl + "user/" + field + query,
       json: true
     }, function( error, response, body ) {
-      // User account wasn't found. Treat differently
-        if ( response.statusCode === 404 ) {
-          return callback();
-        }
-
         // Shallow error check
         if ( error ) {
           return callback( error );
+        }
+
+        // User account wasn't found. Treat differently
+        if ( response.statusCode === 404 ) {
+          return callback();
         }
 
         // Deep error check
