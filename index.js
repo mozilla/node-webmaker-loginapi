@@ -63,27 +63,33 @@ module.exports = function ( app, options ) {
       uri: webmakerUrl + "user/" + field + query,
       json: true
     }, function( error, response, body ) {
-        // Shallow error check
-        if ( error ) {
-          return callback( error );
-        }
+      // Shallow error check
+      if ( error ) {
+        return callback( error );
+      }
 
-        // User account wasn't found. Treat differently
-        if ( response.statusCode === 404 ) {
-          return callback();
-        }
+      // User account wasn't found. Treat differently
+      if ( response.statusCode === 404 ) {
+        return callback();
+      }
 
-        // Deep error check
-        if ( body && body.error ) {
-          return callback( body.error );
-        }
+      // If we get a 503, or otherwise fail to get a body back from the login
+      // server, treat that as an error and bail now.
+      if ( !body ) {
+        return callback( "Error requesting user, server returned nothing." );
+      }
 
-        // Auth error check
-        if ( response.statusCode == 401 ) {
-          return callback( "Authentication failed!" );
-        }
+      // Deep error check
+      if ( body && body.error ) {
+        return callback( body.error );
+      }
 
-        callback( null, body.user );
+      // Auth error check
+      if ( response.statusCode == 401 ) {
+        return callback( "Authentication failed!" );
+      }
+
+      callback( null, body.user );
     });
   }
 
