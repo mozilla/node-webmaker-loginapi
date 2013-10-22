@@ -47,7 +47,7 @@ function stopServer( done ) {
 }
 
 
-describe( "getUser() method", function() {
+describe( "getUserByEmail() method", function() {
   before( function( done ) {
     startServer( null, done );
   });
@@ -57,7 +57,7 @@ describe( "getUser() method", function() {
   });
 
   it( "should return the user object if the user exists", function ( done ) {
-    login.getUser( "foo@foo.com", function ( error, user ){
+    login.getUserByEmail( "foo@foo.com", function ( error, user ){
       assert.ok( !error );
       assert.strictEqual( user._id, "foo@foo.com" );
       done();
@@ -65,7 +65,59 @@ describe( "getUser() method", function() {
   });
 
   it( "should return without args if the user doesn't exist", function ( done ) {
-    login.getUser( "foo@bar.com", function ( error, user ){
+    login.getUserByEmail( "foo@bar.com", function ( error, user ){
+      assert.ok( !error );
+      assert.equal( user, undefined );
+      done();
+    });
+  });
+});
+
+describe( "getUserById() method", function() {
+  before( function( done ) {
+    startServer( null, done );
+  });
+
+  after( function( done ) {
+    stopServer( done );
+  });
+
+  it( "should return the user object if the user exists", function ( done ) {
+    login.getUserById( "1", function ( error, user ){
+      assert.ok( !error );
+      assert.strictEqual( user._id, "foo@foo.com" );
+      done();
+    });
+  });
+
+  it( "should return without args if the user doesn't exist", function ( done ) {
+    login.getUserById( "2", function ( error, user ){
+      assert.ok( !error );
+      assert.equal( user, undefined );
+      done();
+    });
+  });
+});
+
+describe( "getUserByUsername() method", function() {
+  before( function( done ) {
+    startServer( null, done );
+  });
+
+  after( function( done ) {
+    stopServer( done );
+  });
+
+  it( "should return the user object if the user exists", function ( done ) {
+    login.getUserByUsername( "default", function ( error, user ){
+      assert.ok( !error );
+      assert.strictEqual( user._id, "foo@foo.com" );
+      done();
+    });
+  });
+
+  it( "should return without args if the user doesn't exist", function ( done ) {
+    login.getUserByUsername( "fake_username", function ( error, user ){
       assert.ok( !error );
       assert.equal( user, undefined );
       done();
@@ -83,7 +135,7 @@ describe( "Auth failures", function() {
   });
 
   it( "should return a specific error string if the basicauth fails", function ( done ) {
-    login.getUser( "foo@foo.com", function ( error, user ){
+    login.getUserByEmail( "foo@foo.com", function ( error, user ){
       assert.equal( error, "Authentication failed!" );
       done();
     });

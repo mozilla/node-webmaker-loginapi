@@ -94,9 +94,6 @@ module.exports = function ( app, options ) {
   }
 
   var loginAPI = {
-    getUser: function ( id, callback ) {
-      userRequest( id, "", callback );
-    },
     getUserById: function ( id, callback ) {
       userRequest( id, "id/", callback );
     },
@@ -114,7 +111,7 @@ module.exports = function ( app, options ) {
         return res.json( { status: "failure", reason: error } );
       }
 
-      loginAPI.getUser( email, function( err, webmaker ) {
+      loginAPI.getUserByEmail( email, function( err, webmaker ) {
 
         if ( err ) {
           return res.json( 500, {
@@ -173,7 +170,6 @@ module.exports = function ( app, options ) {
 
   return {
     Fogin: Fogin,
-    getUser: loginAPI.getUser,
     getUserById: loginAPI.getUserById,
     getUserByUsername: loginAPI.getUserByUsername,
     getUserByEmail: loginAPI.getUserByEmail
