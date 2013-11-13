@@ -9,7 +9,7 @@ Setup is easy!  Add to your package.json and run `npm install`.
 
 Pass the module:
 
-1. Your app's express instance
+1. Your app's express instance (OPTIONAL, but currently REQUIRED for webmaker apps using persona)
 
     NOTE: Do not call the constructor-function returned by the `require()` until all of your server's general middleware has been declared.
 
@@ -39,9 +39,9 @@ var loginHandle = require( "webmaker-loginapi" )( expressApp, {
 });
 ```
 
-## API Exposure
+## Persona API Exposure
 
-Instantiating this module creates the `GET /user/:id` route in the parent app for use during SSO integration. It exposes the Webmaker username associated with valid persona credentials as `req.session.username`.
+Instantiating this module with an instance of express creates the `GET /user/:id` route in the parent app for use during SSO integration. It exposes the Webmaker username associated with valid persona credentials as `req.session.username`.
 
 The route will return `{ status: "okay", user: user }` when successful, and `{ status: "failure", reason: "error message" }` when not.
 
@@ -61,7 +61,7 @@ The module returns an object with three methods:
 
  ...which retrieves the user model for the passed `username`, passing the callback the parameters `( errorString, userObject )` and
 
-## Testing
+## Testing (Currently broken)
 
 Ensure the `grunt` and `mocha` npm modules are installed globally, then run
 
