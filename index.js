@@ -25,23 +25,28 @@ var request = require( "request" ),
  *  Module.exports
  **/
 module.exports = function ( app, options ) {
-  options = options || {};
-
-  if ( !app ) {
-    throw new Error("webmaker-loginapi error: express app was not passed into function");
+  // Parse parameters
+  if (
+       ( !app && !options ) ||
+       ( !options ) && ( app && !app.loginURL )
+     )
+  {
+    throw new Error( "Webmaker-loginapi error: URI was not passed into function" );
   }
 
-  if ( !options.loginURL ) {
-    throw new Error("webmaker-loginapi error: URI was not passed into function");
+  if ( !options && ( app && app.loginURL ) ) {
+    options = app;
+    app = null;
+    console.error( "Webmaker-loginapi error: express app was not passed into function. Was this intentional?" );
   }
 
   var parsedUrl = require( "url" ).parse( options.loginURL );
 
   if ( parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:" ) {
-    throw new Error( "webmaker-loginapi error: URI protocol must be 'https:' or 'http:'" );
+    throw new Error( "Webmaker-loginapi error: URI protocol must be 'https:' or 'http:'" );
   }
   if ( !parsedUrl.auth || parsedUrl.auth.split( ":" ).length != 2 ) {
-    throw new Error( "webmaker-loginapi error: authentication must be present in URI" );
+    throw new Error( "Webmaker-loginapi error: authentication must be present in URI" );
   }
 
   var authBits = parsedUrl.auth.split( ":" ),
@@ -51,6 +56,7 @@ module.exports = function ( app, options ) {
     user: authBits[ 0 ],
     pass: authBits[ 1 ]
   };
+
 
   function userRequest( query, field, callback ) {
     request({
@@ -105,68 +111,70 @@ module.exports = function ( app, options ) {
     }
   };
 
-  var personaOpts = {
-    verifyResponse: function( error, req, res, email ) {
-      if ( error ) {
-        return res.json( { status: "failure", reason: error } );
-      }
-
-      loginAPI.getUserByEmail( email, function( err, webmaker ) {
-
-        if ( err ) {
-          return res.json( 500, {
-            status: "failure",
-            reason: err,
-            email: email
-          });
+  if ( app ) {
+    var personaOpts = {
+      verifyResponse: function( error, req, res, email ) {
+        if ( error ) {
+          return res.json( { status: "failure", reason: error } );
         }
 
-        if ( !webmaker ) {
-          return res.json( 404, {
-            status: "failure",
-            reason: "webmaker not found",
-            email: email
-          });
-        }
+        loginAPI.getUserByEmail( email, function( err, webmaker ) {
 
-        // Set session
-        req.session.username = webmaker.username;
-        req.session.id = webmaker.id;
-        if ( options.verifyResponse ) {
-          options.verifyResponse( res, {
+          if ( err ) {
+            return res.json( 500, {
+              status: "failure",
+              reason: err,
+              email: email
+            });
+          }
+
+          if ( !webmaker ) {
+            return res.json( 404, {
+              status: "failure",
+              reason: "webmaker not found",
+              email: email
+            });
+          }
+
+          // Set session
+          req.session.username = webmaker.username;
+          req.session.id = webmaker.id;
+          if ( options.verifyResponse ) {
+            options.verifyResponse( res, {
+              status: "okay",
+              user: webmaker,
+              email: email
+            });
+            return;
+          }
+
+          return res.json( 200, {
             status: "okay",
             user: webmaker,
             email: email
           });
-          return;
+        });
+      },
+      logoutResponse: function( error, req, res ) {
+        delete req.session.username;
+        delete req.session.id;
+
+        if ( error ) {
+          return res.json( { status: "failure", reason: error } );
         }
 
-        return res.json( 200, {
-          status: "okay",
-          user: webmaker,
-          email: email
-        });
-      });
-    },
-    logoutResponse: function( error, req, res ) {
-      delete req.session.username;
-      delete req.session.id;
-
-      if ( error ) {
-        return res.json( { status: "failure", reason: error } );
+        res.json( { status: "okay" } );
       }
+    };
 
-      res.json( { status: "okay" } );
-    }
-  };
+    Object.keys( options ).forEach( function( key ) {
+      if ( !personaOpts[ key ] ) {
+        personaOpts[ key ] = options[ key ];
+      }
+    });
 
-  Object.keys(options).forEach( function( key ) {
-    if ( !personaOpts[ key ] ) {
-      personaOpts[ key ] = options[ key ];
-    }
-  });
-
-  persona( app, personaOpts );
+    persona( app, personaOpts );
+  }
 
   return {
     Fogin: Fogin,
