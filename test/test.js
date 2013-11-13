@@ -29,16 +29,20 @@ var assert = require( 'assert' ),
     }),
     Fogin = login.Fogin;
 
+var adminUser = "admin@webmaker.org",
+    notAdminUser = "notadmin@webmaker.org",
+    missingUser = {
+      email: "foo@foo.com",
+      username: "idontexist",
+      id: 999
+    };
+
 function startServer( options, done ) {
   options = options || { username: username, password: password, port: port };
   Fogin.start({
     port: options.port,
     username: options.username,
-    password: options.password,
-    logins: [{
-      email: 'foo@foo.com',
-      isAdmin: true
-    }]
+    password: options.password
   }, done );
 }
 
@@ -57,15 +61,15 @@ describe( "getUserByEmail() method", function() {
   });
 
   it( "should return the user object if the user exists", function ( done ) {
-    login.getUserByEmail( "foo@foo.com", function ( error, user ){
+    login.getUserByEmail( notAdminUser, function ( error, user ){
       assert.ok( !error );
-      assert.strictEqual( user._id, "foo@foo.com" );
+      assert.strictEqual( user.email, notAdminUser );
       done();
     });
   });
 
   it( "should return without args if the user doesn't exist", function ( done ) {
-    login.getUserByEmail( "foo@bar.com", function ( error, user ){
+    login.getUserByEmail( missingUser.email, function ( error, user ){
       assert.ok( !error );
       assert.equal( user, undefined );
       done();
@@ -83,15 +87,22 @@ describe( "getUserById() method", function() {
   });
 
   it( "should return the user object if the user exists", function ( done ) {
-    login.getUserById( "1", function ( error, user ){
-      assert.ok( !error );
-      assert.strictEqual( user._id, "foo@foo.com" );
-      done();
+    var testEmail = notAdminUser;
+
+    login.getUserByEmail( testEmail, function( e, u ) {
+      assert.ok( !e );
+
+      login.getUserById( u.id, function ( error, user ) {
+        assert.ok( !error );
+        assert.strictEqual( user.email, testEmail );
+        done();
+      });
     });
   });
 
+
   it( "should return without args if the user doesn't exist", function ( done ) {
-    login.getUserById( "2", function ( error, user ){
+    login.getUserById( missingUser.id, function ( error, user ){
       assert.ok( !error );
       assert.equal( user, undefined );
       done();
@@ -109,15 +120,19 @@ describe( "getUserByUsername() method", function() {
   });
 
   it( "should return the user object if the user exists", function ( done ) {
-    login.getUserByUsername( "default", function ( error, user ){
-      assert.ok( !error );
-      assert.strictEqual( user._id, "foo@foo.com" );
-      done();
+    login.getUserByEmail( notAdminUser, function( e, u ) {
+      assert.ok( !e );
+
+      login.getUserByUsername( u.username, function ( error, user ){
+        assert.ok( !error );
+        assert.strictEqual( user.email, notAdminUser );
+        done();
+      });
     });
   });
 
   it( "should return without args if the user doesn't exist", function ( done ) {
-    login.getUserByUsername( "fake_username", function ( error, user ){
+    login.getUserByUsername( missingUser.username, function ( error, user ){
       assert.ok( !error );
       assert.equal( user, undefined );
       done();

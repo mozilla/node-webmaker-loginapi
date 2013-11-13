@@ -26,7 +26,7 @@
  *
  * where `options` should have a username, password, and port.  The username
  * and password pair are used for HTTP basic auth. You can also provide an
- * array of logins, with data for users to be insterted into the fake login
+ * array of logins, with data for users to be inserted into the fake login
  * server:
  *
  * Fogin.start({
@@ -54,25 +54,27 @@ var express = require( "express" ),
     server,
     loginStoreByEmail = {},
     loginStoreById = {},
-    loginStoreByUsername = {};
+    loginStoreByUsername = {},
+    userIdIncrementer = 0;
 
 // Simulate login store. If you want to add items, do it in start().
 function createLogin( user ) {
   var now = Date.now();
     userObj = {
-      id: 1,
-      _id: user.email,
+      id: userIdIncrementer++,
       email: user.email,
-      username: user.username || "default",
-      fullName: user.fullName || "default",
-      displayName: user.fullName || "default",
-      createdAt: now,
-      updatedAt: now,
+      username: user.username && user.username.toLowerCase() || "default",
+      fullName: user.username || "default",
       deletedAt: null,
       isAdmin: !!user.isAdmin,
-      isSuspended: user.isSuspended === true,
-      sendNotifications: user.sendNotifications === true,
-      sendEngagements: user.sendEngagements === true
+      isCollaborator: !!user.isCollaborator,
+      isSuspended: !!user.isSuspended,
+      sendNotifications: !!user.sendNotifications,
+      sendEngagements: !!user.sendEngagements,
+      sendEventCreationEmails: !!user.sendEventCreationEmails,
+      wasMigrated: !!user.wasMigrated,
+      createdAt: now,
+      updatedAt: now
     };
 
   loginStoreByEmail[ userObj.email ] =
@@ -89,13 +91,18 @@ module.exports = {
 
     var port = options.port || 5234,
         app = express(),
-        defaultLogin = {
-          email: "default@webmaker.org",
-          username: "username",
-          fullName: "John Smith",
-          isAdmin: true
-        },
-        logins = options.logins || [ defaultLogin ],
+        defaultLogins = [{
+            email: "admin@webmaker.org",
+            username: "admin",
+            fullName: "John Smith",
+            isAdmin: true
+          },{
+            email: "notadmin@webmaker.org",
+            username: "notadmin",
+            fullName: "Jane Smith"
+          }
+        ],
+        logins = options.logins || defaultLogins,
         basicAuth = express.basicAuth( function ( username, password ) {
           return (username === options.username && password === options.password);
         });
