@@ -38,6 +38,15 @@ function startServer( options, done ) {
     logins: [{
       email: 'foo@foo.com',
       isAdmin: true
+    }, {
+      email: "foo2@foo.com",
+      username: "username2"
+    }, {
+      email: "foo3@foo.com",
+      username: "username3"
+    }, {
+      email: "foo4@foo.com",
+      username: "username4"
     }]
   }, done );
 }
@@ -91,7 +100,7 @@ describe( "getUserById() method", function() {
   });
 
   it( "should return without args if the user doesn't exist", function ( done ) {
-    login.getUserById( "2", function ( error, user ){
+    login.getUserById( "42", function ( error, user ){
       assert.ok( !error );
       assert.equal( user, undefined );
       done();
@@ -120,6 +129,32 @@ describe( "getUserByUsername() method", function() {
     login.getUserByUsername( "fake_username", function ( error, user ){
       assert.ok( !error );
       assert.equal( user, undefined );
+      done();
+    });
+  });
+});
+
+describe( "getUsernamesByEmails() method", function() {
+  before( function( done ) {
+    startServer( null, done );
+  });
+
+  after( function( done ) {
+    stopServer( done );
+  });
+
+  it( "should turn the emails into usernames", function( done ) {
+    var users = {
+      "foo2@foo.com": "username2",
+      "foo3@foo.com": "username3",
+      "foo4@foo.com": "username4"
+    };
+
+    login.getUsernamesByEmails( Object.keys( users ), function ( error, usernamesMap ) {
+      Object.keys( usernamesMap ).forEach( function( email ) {
+        assert( email in users );
+        assert( users[ email ] === usernamesMap[ email ].username );
+      });
       done();
     });
   });

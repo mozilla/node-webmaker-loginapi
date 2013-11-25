@@ -52,7 +52,11 @@ module.exports = function ( app, options ) {
     pass: authBits[ 1 ]
   };
 
-  function userRequest( query, field, callback ) {
+  function sendRequest( url, body, callback ) {
+    // The request module has trouble if body is any falsy value other than null
+    if ( !body ) {
+      body = undefined;
+    }
     request({
       auth: {
         username: authBits.user,
@@ -60,7 +64,8 @@ module.exports = function ( app, options ) {
         sendImmediately: true
       },
       method: "GET",
-      uri: webmakerUrl + "user/" + field + query,
+      body: body,
+      uri: url,
       json: true
     }, function( error, response, body ) {
       // Shallow error check
@@ -88,20 +93,26 @@ module.exports = function ( app, options ) {
       if ( response.statusCode == 401 ) {
         return callback( "Authentication failed!" );
       }
-
-      callback( null, body.user );
+      if ( body.user ) {
+        callback( null, body.user );
+      } else {
+        callback( null, body );
+      }
     });
   }
 
   var loginAPI = {
     getUserById: function ( id, callback ) {
-      userRequest( id, "id/", callback );
+      sendRequest( webmakerUrl + "user/id/" + id, null, callback );
     },
     getUserByUsername: function ( username, callback ) {
-      userRequest( username, "username/", callback );
+      sendRequest( webmakerUrl + "user/username/" + username, null, callback );
     },
     getUserByEmail: function ( email, callback ) {
-      userRequest( email, "email/", callback );
+      sendRequest( webmakerUrl + "user/email/" + email, null, callback );
+    },
+    getUsernamesByEmails: function( emails, callback ) {
+      sendRequest( webmakerUrl + "usernames", emails, callback );
     }
   };
 
@@ -172,6 +183,7 @@ module.exports = function ( app, options ) {
     Fogin: Fogin,
     getUserById: loginAPI.getUserById,
     getUserByUsername: loginAPI.getUserByUsername,
-    getUserByEmail: loginAPI.getUserByEmail
+    getUserByEmail: loginAPI.getUserByEmail,
+    getUsernamesByEmails: loginAPI.getUsernamesByEmails
   };
 };
