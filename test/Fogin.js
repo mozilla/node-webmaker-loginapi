@@ -54,13 +54,14 @@ var express = require( "express" ),
     server,
     loginStoreByEmail = {},
     loginStoreById = {},
-    loginStoreByUsername = {};
+    loginStoreByUsername = {},
+    userIdCounter;
 
 // Simulate login store. If you want to add items, do it in start().
 function createLogin( user ) {
   var now = Date.now();
     userObj = {
-      id: 1,
+      id: userIdCounter++,
       _id: user.email,
       email: user.email,
       username: user.username || "default",
@@ -86,6 +87,7 @@ module.exports = {
     options.username = options.username || "username";
     options.password = options.password || "password";
     callback = callback || function(){};
+    userIdCounter = 1;
 
     var port = options.port || 5234,
         app = express(),
@@ -137,6 +139,25 @@ module.exports = {
       } else {
         res.json({ user: login });
       }
+    });
+
+    // App GET Usernames By Emails
+    app.get( '/usernames', basicAuth, function( req, res ) {
+      if ( !req.body || !Array.isArray( req.body ) ) {
+        return res.json( 400, { error: "Invalid request body" } );
+      }
+
+      var respObj = [];
+
+      req.body.forEach( function( email ) {
+        if ( email in loginStoreByEmail ) {
+          respObj[ email ] = {
+            username: loginStoreByEmail[ email ].username
+          };
+        }
+      });
+
+      res.json( 200, respObj );
     });
 
     server = app.listen( port, function( req, res ) {
